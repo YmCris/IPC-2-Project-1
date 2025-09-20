@@ -1,4 +1,4 @@
-package backend.system;
+package controller.system;
 
 import backend.exceptions.ObjectAlredyExistException;
 import backend.user.User;

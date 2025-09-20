@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,12 +19,12 @@ import java.util.Optional;
 public class UserCreateDB {
 
     // CONSTANTES -------------------------------------------------
-    private static final String SQL_INSERT_USER
-            = "INSERT INTO user (user_name, password, dpi, phone_number, institution_name, email, photo, is_foreign, active) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USER = "INSERT INTO user (user_name, password, dpi, phone_number, institution_name, email, photo, is_foreign, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_GET_USER_EXISTENCE = "SELECT * FROM user WHERE dpi = ?";
+    private static final String SQL_GET_USER_IS_CORRECT = "SELECT * FROM user WHERE dpi = ? AND password = ?";
+    private static final String SQL_GET_USER = "SELECT * FROM user WHERE dpi = ?";
     private static final String SQL_GET_USERS = "SELECT * FROM user ";
-    //private static final String SQL_EDIT_USER = "UPDATE user set name = ?, phoneNumber = ?, email = ? , password = ? WHERE codigo = ?";
+    private static final String SQL_EDIT_USER = "UPDATE user set name = ?, phoneNumber = ?, email = ? , password = ? WHERE codigo = ?";
 
     // MÉTODOS CONCRETOS -------------------------------------------------------
     public void createUser(User user) {
@@ -37,7 +36,7 @@ public class UserCreateDB {
             insert.setString(4, user.getPhoneNumber());
             insert.setString(5, user.getInstitutionName());
             insert.setString(6, user.getEmail());
-            insert.setBlob(7,InputStream.nullInputStream());
+            insert.setBlob(7, InputStream.nullInputStream());
             insert.setBoolean(8, user.isForeign());
             insert.setBoolean(9, user.isActive());
             insert.executeUpdate();
@@ -59,7 +58,21 @@ public class UserCreateDB {
         }
         return false;
     }
-    /*
+
+    public boolean userExist(String dpi, String password) {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement query = connection.prepareStatement(SQL_GET_USER_IS_CORRECT);) {
+            query.setString(1, dpi);
+            query.setString(2, password);
+            ResultSet result = query.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            System.out.println("Ha ocurrido una exception del tipo " + e.getClass().getName() + " al ver si existe el usuario porque " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<>(10);
         Connection connection = DBConnection.getInstance().getConnection();
@@ -72,7 +85,7 @@ public class UserCreateDB {
                         resultSet.getString("email"),
                         resultSet.getString("password"),
                         resultSet.getString("photo"),
-                        resultSet.getString("insititutionName"),
+                        resultSet.getString("insititution_name"),
                         resultSet.getBoolean("foreign"),
                         resultSet.getBoolean("active")
                 );
@@ -85,6 +98,7 @@ public class UserCreateDB {
         return users;
     }
 
+    /*
     public Optional<User> getUser(String dpi) {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement query = connection.prepareStatement(SQL_GET_USER_EXISTENCE);) {
@@ -109,7 +123,32 @@ public class UserCreateDB {
         }
         return Optional.empty();
     }
-
+     */
+    public User getUser(String dpi) {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement query = connection.prepareStatement(SQL_GET_USER);) {
+            query.setString(1, dpi);
+            ResultSet resultSet = query.executeQuery();
+            if (resultSet.next()) {
+                User user = new User(resultSet.getString("name"),
+                        resultSet.getString("dpi"),
+                        resultSet.getString("phoneNumber"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("photo"),
+                        resultSet.getString("insititution_name"),
+                        resultSet.getBoolean("foreign"),
+                        resultSet.getBoolean("active")
+                );
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Ha ocurrido una exception del tipo " + e.getClass().getName() + " al obtener al usuario por su dpi porque " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     public void editUser(User user) {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement insert = connection.prepareStatement(SQL_EDIT_USER);) {
@@ -128,5 +167,4 @@ public class UserCreateDB {
             e.printStackTrace();
         }
     }
-     */
 }

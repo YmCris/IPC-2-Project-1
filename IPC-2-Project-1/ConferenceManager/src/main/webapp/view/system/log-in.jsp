@@ -16,7 +16,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Log in</title>
         <jsp:include page="/includes/resources.jsp"/>
-        <jsp:include page="/includes/header.jsp"/>
     </head>
     <!-- BODY -->
     <body class="bg-light">
@@ -26,19 +25,19 @@
                 <p class="text-center mb-4">Inicia sesión con tu nombre de usuario y contraseña</p>
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        <form method="post" action="procesarMensaje.jsp">
+                        <form class="needs-validation" method="POST" action="${pageContext.servletContext.contextPath}/system/log-in-servlet">
                             <div class="mb-3">
                                 <label><b>DPI</b></label>
-                                <input type="text" class="form-control" id="dpi" name="dpi" placeholder="Nombre de usuario" required="">
+                                <input type="text" class="form-control" id="dpi" name="dpi" placeholder="DPI" required="">
                             </div>
                             <div class="mb-3">
                                 <label><b>Contraseña</b></label>
-                                <input type="text" class="form-control" id="contraseña" name="contraseña" placeholder="Contraseña" required="">
+                                <input type="text" class="form-control" id="password" name="password" placeholder="Contraseña" required="">
                             </div>
                             <div class="d-flex flex-column align-items-center">
                                 <button type="submit" class="btn btn-primary w-100 mb-2">Iniciar Sesión</button>
                                 <button class="btn btn-secondary mb-2">¿Olvidaste la contraseña?</button>
-                                <button class="btn btn-secondary  mb-2">Registrarse</button>
+                                <button href="sign-up.jsp" class="btn btn-secondary  mb-2">Registrarse</button>
                             </div>
                         </form>
                     </div>
